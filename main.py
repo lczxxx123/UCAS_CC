@@ -68,12 +68,13 @@ def choose_course(session, course_dict, identity, course_ids):
     """ 循环选课 """
     print "-------------"
     success_courses = []
+    try_index = 0
     while True:
         for course_id in course_ids:
             if (course_id in course_dict) and (course_id not in success_courses):
                 course = course_dict[course_id]
                 print "---------------------"
-                print course_id, ",", course
+                print "trying %d times," % try_index, course_id, ":", course
                 form_data = {
                     'deptIds': course["dept_id"],
                     'sids': course["id"]
@@ -84,6 +85,7 @@ def choose_course(session, course_dict, identity, course_ids):
                 if u"成功" in msg:  # 选课成功,就记录一下,然后保存到ucas_cc.log中
                     success_courses.append(course_id)
                     logging.info(msg)
+                try_index += 1
 
 
 if __name__ == "__main__":
@@ -94,7 +96,9 @@ if __name__ == "__main__":
                         filemode='w')
 
     session = requests.session()
-    login(session)
+    if not login(session):
+        print "登陆失败"
+        exit(-1)
     identity = get_identity(session)                            # 获取身份id
 
     # 加载course_dict
