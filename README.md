@@ -1,5 +1,6 @@
 # UCAS_CC
-中科大抢课脚本。
+国
+科大抢课脚本。
 
 ## Environment
 Python: 2.7
