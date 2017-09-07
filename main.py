@@ -5,6 +5,7 @@ from config import *
 import cPickle as pickle
 import os
 import logging
+from requests.exceptions import ReadTimeout
 
 
 def get_identity(session):
@@ -70,22 +71,26 @@ def choose_course(session, course_dict, identity, course_ids):
     success_courses = []
     try_index = 0
     while True:
-        for course_id in course_ids:
-            if (course_id in course_dict) and (course_id not in success_courses):
-                course = course_dict[course_id]
-                print "---------------------"
-                print "trying %d times," % try_index, course_id, ":", course
-                form_data = {
-                    'deptIds': course["dept_id"],
-                    'sids': course["id"]
-                }
-                resp = session.post("http://jwxk.ucas.ac.cn/courseManage/saveCourse?s=" + identity, data=form_data)
-                msg = get_message(resp.text).strip()
-                print msg
-                if u"成功" in msg:  # 选课成功,就记录一下,然后保存到ucas_cc.log中
-                    success_courses.append(course_id)
-                    logging.info(msg)
-                try_index += 1
+        try:
+            for course_id in course_ids:
+                if (course_id in course_dict) and (course_id not in success_courses):
+                    course = course_dict[course_id]
+                    print "---------------------"
+                    print "trying %d times," % try_index, course_id, ":", course
+                    form_data = {
+                        'deptIds': course["dept_id"],
+                        'sids': course["id"]
+                    }
+                    resp = session.post("http://jwxk.ucas.ac.cn/courseManage/saveCourse?s=" + identity,
+                                        data=form_data, timeout=1)
+                    msg = get_message(resp.text).strip()
+                    print msg
+                    if u"成功" in msg:  # 选课成功,就记录一下,然后保存到ucas_cc.log中
+                        success_courses.append(course_id)
+                        logging.info(msg)
+                    try_index += 1
+        except ReadTimeout as ex:
+            print ex.message
 
 
 if __name__ == "__main__":
@@ -104,14 +109,16 @@ if __name__ == "__main__":
     # 加载course_dict
     course_dict = []
     if os.path.exists("./course_dict.pickle"):
+        print "loading course_dict from ./course_dict.pickle"
         with open("./course_dict.pickle", "rb") as f:
             course_dict = pickle.load(f)
     else:
+        print "getting the course_dict"
         dept_ids = get_dept_ids(session)                            # 获取学院id
         course_dict = get_course_dict(session, identity, dept_ids)  # 获取课程字典, 比较耗时间, 所以做一下缓存
         with open("./course_dict.pickle", "wb") as f:
             pickle.dump(course_dict, f)
-            print "saving"
+            print "saving ./course_dict.pickle"
 
     # 循环慢慢跑把
     choose_course(session, course_dict, identity, course_ids)   # 选课
