@@ -1,4 +1,5 @@
 from config import *
+from bs4 import BeautifulSoup
 
 
 def login(session):
@@ -6,8 +7,7 @@ def login(session):
     form = {
         'userName': username,
         'pwd': password,
-        'sb': 'sb',
-        'rememberMe': '1'
+        'sb': 'sb'
     }
     session.post(login_url, data=form, headers=headers)
     print session.cookies.get_dict()
@@ -16,9 +16,8 @@ def login(session):
     return False
 
 
-def try_choose_chourse(session, course_id):
-    add_course_url = "http://sep.ucas.ac.cn/courseManage/addCourseSite.json?courseId=%s" % course_id
-    print add_course_url
-    resp = session.get(add_course_url)
-    print resp.content
+def get_message(html):
+    css_soup = BeautifulSoup(html, 'html.parser')
+    text = css_soup.select('#main-content > div > div.m-cbox.m-lgray > div.mc-body > div')[0].text
+    return "".join(line.strip() for line in text.split('\n'))
 

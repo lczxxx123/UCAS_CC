@@ -1,3 +1,5 @@
 .idea/
 config.py
 *.pyc
+*.pickle
+ucas_cc.log
