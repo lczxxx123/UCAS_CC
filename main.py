@@ -40,7 +40,7 @@ def get_dept_ids(session):
 def get_course_dict(session, identity, dept_ids):
     """ 获取课程id对应 """
     course_dict = {}
-    for dept_id in dept_ids:
+    for dept_id in dept_ids:  # 一个一个学院的获取
         form_data = {
             "deptIds": dept_id,
             "sb": 0
@@ -67,7 +67,6 @@ def get_course_dict(session, identity, dept_ids):
 
 def choose_course(session, course_dict, identity, course_ids):
     """ 循环选课 """
-    print "-------------"
     success_courses = []
     try_index = 0
     while True:
