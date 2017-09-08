@@ -5,7 +5,7 @@ from config import *
 import cPickle as pickle
 import os
 import logging
-from requests.exceptions import ReadTimeout
+from requests.exceptions import ReadTimeout, ConnectTimeout
 
 
 def get_identity(session):
@@ -91,6 +91,8 @@ def choose_course(session, course_dict, identity, course_ids):
                     try_index += 1
         except ReadTimeout as ex:
             print ex.message
+        except ConnectTimeout as ex:
+            print ex.message
 
 
 if __name__ == "__main__":
@@ -99,27 +101,31 @@ if __name__ == "__main__":
                         datefmt='%a, %d %b %Y %H:%M:%S',
                         filename='ucas_cc.log',
                         filemode='w')
+    while True:  # 循环慢慢跑把
+        try:
+            session = requests.session()
+            if not login(session):
+                print "登陆失败"
+                exit(-1)
+            identity = get_identity(session)                            # 获取身份id
 
-    session = requests.session()
-    if not login(session):
-        print "登陆失败"
-        exit(-1)
-    identity = get_identity(session)                            # 获取身份id
+            # 加载course_dict
+            course_dict = []
+            if os.path.exists("./course_dict.pickle"):
+                print "loading course_dict from ./course_dict.pickle"
+                with open("./course_dict.pickle", "rb") as f:
+                    course_dict = pickle.load(f)
+            else:
+                print "getting the course_dict"
+                dept_ids = get_dept_ids(session)                            # 获取学院id
+                course_dict = get_course_dict(session, identity, dept_ids)  # 获取课程字典, 比较耗时间, 所以做一下缓存
+                with open("./course_dict.pickle", "wb") as f:
+                    pickle.dump(course_dict, f)
+                    print "saving ./course_dict.pickle"
 
-    # 加载course_dict
-    course_dict = []
-    if os.path.exists("./course_dict.pickle"):
-        print "loading course_dict from ./course_dict.pickle"
-        with open("./course_dict.pickle", "rb") as f:
-            course_dict = pickle.load(f)
-    else:
-        print "getting the course_dict"
-        dept_ids = get_dept_ids(session)                            # 获取学院id
-        course_dict = get_course_dict(session, identity, dept_ids)  # 获取课程字典, 比较耗时间, 所以做一下缓存
-        with open("./course_dict.pickle", "wb") as f:
-            pickle.dump(course_dict, f)
-            print "saving ./course_dict.pickle"
-
-    # 循环慢慢跑把
-    choose_course(session, course_dict, identity, course_ids)   # 选课
+            choose_course(session, course_dict, identity, course_ids)   # 选课
+        except KeyboardInterrupt:
+            raise
+        except Exception as ex:
+            print ex.message
 
