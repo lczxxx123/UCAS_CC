@@ -65,13 +65,14 @@ def get_course_dict(session, identity, dept_ids):
     return course_dict
 
 
-def choose_course(session, course_dict, identity, course_ids):
+def choose_course(session, course_dict, identity, des_courses):
     """ 循环选课 """
     success_courses = []
     try_index = 0
     while True:
         try:
-            for course_id in course_ids:
+            for des_course in des_courses:
+                course_id = des_course["id"]
                 if (course_id in course_dict) and (course_id not in success_courses):
                     course = course_dict[course_id]
                     print "---------------------"
@@ -80,6 +81,8 @@ def choose_course(session, course_dict, identity, course_ids):
                         'deptIds': course["dept_id"],
                         'sids': course["id"]
                     }
+                    if des_course["degree"]:  # 是否是学位课
+                        form_data["did_%s" % course["id"]] = course["id"]
                     resp = session.post("http://jwxk.ucas.ac.cn/courseManage/saveCourse?s=" + identity,
                                         data=form_data, timeout=1)
                     msg = get_message(resp.text).strip()
@@ -122,7 +125,7 @@ if __name__ == "__main__":
                     pickle.dump(course_dict, f)
                     print "saving ./course_dict.pickle"
 
-            choose_course(session, course_dict, identity, course_ids)   # 选课
+            choose_course(session, course_dict, identity, des_courses)   # 选课
         except KeyboardInterrupt:
             raise
         except Exception as ex:

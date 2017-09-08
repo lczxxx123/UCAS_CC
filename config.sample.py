@@ -1,16 +1,18 @@
-username = ""
-password = ""
+# coding=utf-8
 
-course_ids = [
-    "TYMGX010H-03",
-    # "091M4042H",
-    # "091M5023H",
-    # "092M1002H-1",
-    # "09MGX005H",
-    # "201M4010H",
-    # "201M5006H",
-    # "201M5019H",
-    # "201M6011H"
+username = ""   # 用户名
+password = ""   # 密码
+
+# 要选的课
+des_courses = [
+    # {
+    #     "id": "TYMGX010H-03",
+    #     "degree": False   # 是否是学位课
+    # },
+    {
+        "id": "201M5019H",
+        "degree": True   # 是否是学位课
+    }
 ]
 
 
