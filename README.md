@@ -16,10 +16,24 @@ pip install -r requirements.txt
 ```
 
 ## Usage
-``` sh
-mv config.sample.py config.py   # 配置个人信息
-python main.py                  # 开始选课
+### 修改配置
 ```
+mv config.sample.py config.py      # 配置个人信息
+```
+### 抢课
+``` sh
+python main.py                     # 用于选人满的课
+```
+### 快速选课
+``` sh
+python fast_cc.py                  # 用于预先选课
+```
+
+## 快速选课说明
+### depId配置
+![](./note_deptId.png)
+### sids配置
+![](./note_sids.png)
 
 ## LICENSE
 MIT

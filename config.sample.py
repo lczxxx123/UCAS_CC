@@ -16,6 +16,12 @@ des_courses = [
 ]
 
 
+# 快速选课
+des_form = {
+    "depId": ["915", "964"],                 # 学院的id,配置方法见README
+    "sids": ["136262", "136502", "136534"]   # 课程的id,配置方法见README
+}
+
 headers = {
     'Host': 'sep.ucas.ac.cn',
     'Connection': 'keep-alive',
