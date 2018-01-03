@@ -22,11 +22,11 @@ mv config.sample.py config.py      # 配置个人信息
 ```
 ### 抢课
 ``` sh
-python main.py                     # 用于选人满的课
+python main.py                     # 用于选人满的课，请修改config.py中的des_courses字段
 ```
 ### 快速选课
 ``` sh
-python fast_cc.py                  # 用于预先选课
+python fast_cc.py                  # 比main.py速度更快，适合开抢时候用。请修改config.py中的
 ```
 
 ## 快速选课说明
